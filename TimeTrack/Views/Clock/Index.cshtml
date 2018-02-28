@@ -1,0 +1,62 @@
+﻿@model TimeTrack.ViewModels.EmployeePunchViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Employee Punch Clock</h2>
+
+<form id="clockForm" name="clockForm">
+    <button id="clock-in" data-action="5" 
+            class="js-clock btn btn-primary">Clock In</button>
+    <button id="out-to-lunch" data-action="6" 
+            class="js-clock btn btn-primary">Out to Lunch</button>
+    <button id="back-from-lunch" data-action="7" 
+            class="js-clock btn btn-primary">Back from Lunch</button>
+    <button id="clock-out" data-action="8" 
+            class="js-clock btn btn-primary">Clock Out</button>
+</form>
+
+@section scripts {
+<script>
+
+        //# sourceURL=MyInlineScript.js
+        $(document).ready(function () {
+            var vm = {
+                employeeId: @Model.Employee.Id
+            };
+
+            var disableClockIn = @Model.ClockedIn.ToString().ToLower() ? true : false;
+            var disableClockOut = @Model.ClockedOut.ToString().ToLower() ? true : false;
+            var disableOutToLunch = @Model.OutToLunch.ToString().ToLower() ? true : false;
+            var disableBackFromLunch = @Model.BackFromLunch.ToString().ToLower() ? true : false;
+
+            $("#clock-in").prop("disabled", disableClockIn);
+            $("#clock-out").prop("disabled", disableClockOut);
+            $("#out-to-lunch").prop("disabled", disableOutToLunch);
+            $("#back-from-lunch").prop("disabled", disableBackFromLunch);
+
+            $("#clockForm .js-clock").on("click",
+                function () {
+
+                    //alert("You clicked " + $(this).text());
+                    
+                    var button = $(this);
+                    var punchRecorded = button.text();
+                    vm.punchTypeId = button.attr("data-action");
+                    vm.punchEventTime = new Date().toISOString();
+                    $.ajax({
+                            url: "/api/clockpunch",
+                            method: "post",
+                            data: vm
+                            
+                    }).done(function() {
+                        toastr.success(punchRecorded + " recorded in database.");
+                        button.prop('disabled', true);
+                    });
+                    return false;
+                });
+        });
+</script>
+}
+
