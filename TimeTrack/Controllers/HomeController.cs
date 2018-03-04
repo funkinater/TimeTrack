@@ -13,6 +13,7 @@ namespace TimeTrack.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Domain Admins")]
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

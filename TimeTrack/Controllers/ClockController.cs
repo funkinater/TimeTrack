@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Drawing;
 using System.Linq;
@@ -42,24 +43,31 @@ namespace TimeTrack.Controllers
                 userInDb = newUser;
             }
 
+            var week = new Week();
+
+            //clock punches for this employee, today
             var punches = _context.ClockPunches
                 .Include(p => p.PunchType)
                 .Where(p=>p.Employee.Id == userInDb.Id &&
                          DbFunctions.TruncateTime(p.PunchEventTime) ==
                           DbFunctions.TruncateTime(DateTime.Now));
 
-            //var punches = from p in allPunches
-            //    where p.Employee.Id == userInDb.Id && 
-            //          DbFunctions.TruncateTime(p.PunchEventTime) == 
-            //          DbFunctions.TruncateTime(DateTime.Now)
-            //    select p;
-            
+            //clock punches for this employee, this week
+            var punchesWeek = _context.ClockPunches
+                .Include(p => p.PunchType).AsEnumerable()
+                .Where(p => p.EmployeeId == userInDb.Id &&
+                            p.PunchEventTime.Date >= week.Start.Date &&
+                            p.PunchEventTime.Date <= week.End.Date);
 
-                var viewModel = new EmployeePunchViewModel
+            var dt = new Pivot().PivotTable(punchesWeek);
+            
+            var viewModel = new EmployeePunchViewModel
             {
                 Employee = userInDb,
-                ClockPunches = punches
-
+                ClockPunches = punches,
+                ClockPunchesWeek = punchesWeek,
+                Week = week,
+                PunchesThisWeek = dt
             };
 
             Console.WriteLine(userInDb);

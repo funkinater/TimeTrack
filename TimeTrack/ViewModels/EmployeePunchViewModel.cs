@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Web;
@@ -11,6 +12,10 @@ namespace TimeTrack.ViewModels
     {
         public Employee Employee { get; set; }
         public IEnumerable<ClockPunch> ClockPunches { get; set; }
+        public IEnumerable<ClockPunch> ClockPunchesWeek { get; set; }
+        public Week Week { get; set; }
+
+        public DataTable PunchesThisWeek { get; set; }
 
         public bool ClockedIn
         {

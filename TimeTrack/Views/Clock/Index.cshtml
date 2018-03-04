@@ -1,27 +1,102 @@
-﻿@model TimeTrack.ViewModels.EmployeePunchViewModel
+﻿@using System.Data
+@model TimeTrack.ViewModels.EmployeePunchViewModel
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Employee Punch Clock</h2>
+<div class="container">
+    
+    <div class="col-md-3">
+        <form id="clockForm" name="clockForm">
+            <div class="row">
+                <button id="clock-in" data-action="5"
+                        class="js-clock btn btn-primary btn-block">Clock In
+                </button>
+            </div>
 
-<form id="clockForm" name="clockForm">
-    <button id="clock-in" data-action="5" 
-            class="js-clock btn btn-primary">Clock In</button>
-    <button id="out-to-lunch" data-action="6" 
-            class="js-clock btn btn-primary">Out to Lunch</button>
-    <button id="back-from-lunch" data-action="7" 
-            class="js-clock btn btn-primary">Back from Lunch</button>
-    <button id="clock-out" data-action="8" 
-            class="js-clock btn btn-primary">Clock Out</button>
-</form>
+            <div class="row">
+                <button id="out-to-lunch" data-action="6"
+                        class="js-clock btn btn-primary btn-block">
+                    Out to Lunch
+                </button>
+            </div>
+
+            <div class="row">
+                <button id="back-from-lunch" data-action="7"
+                        class="js-clock btn btn-primary btn-block">
+                    Back from Lunch
+                </button>
+            </div>
+
+            <div class="row">
+                <button id="clock-out" data-action="8"
+                        class="js-clock btn btn-primary btn-block">
+                    Clock Out
+                </button>
+            </div>
+
+        </form>
+        
+        <div class="row"></div>
+        
+    </div>
+    <div class="col-md-2"></div>
+    
+    
+    <div class="col-md-7">
+        <h2>This Week</h2>
+        <p>You have <span id="hours">_</span> hours accrued this week.</p>
+        <div class="table-responsive">
+            
+            <table class="table-striped table-bordered" name="hoursSummary">
+                <thead>
+                <tr>
+                    @foreach (DataColumn col in Model.PunchesThisWeek.Columns)
+                    {
+                        <th class="col-md-1 text-left">@col.ColumnName</th>
+                    }
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (DataRow row in Model.PunchesThisWeek.Rows)
+                {
+                    <tr class="data">
+                        @foreach (DataColumn col in Model.PunchesThisWeek.Columns)
+                        {
+                            <td>@row[col.ColumnName]</td>
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+
+        </div>
+        
+    </div>
+
+    <div class="col-md-7">
+        <div class="row">
+
+        </div>
+
+    </div>
+
+</div>
 
 @section scripts {
 <script>
 
         //# sourceURL=MyInlineScript.js
-        $(document).ready(function () {
+    $(document).ready(function () {
+        var hoursTotal = 0;
+        $("tr.data").each(function() {
+            hoursTotal += parseFloat($(this).find("td:nth-child(6)").text());
+        });
+
+        $("#hours").text(hoursTotal);
+
             var vm = {
                 employeeId: @Model.Employee.Id
             };
